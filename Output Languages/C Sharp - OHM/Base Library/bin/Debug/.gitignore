@@ -1,0 +1,5 @@
+# Ignore generated binary files
+*.dll
+*.mdb
+*.pdb
+*.exe

@@ -1,0 +1,11 @@
+# Ignore the user prefs
+*.userprefs
+*.user
+*.usertasks
+
+# Ignore the entire generated object dir
+obj
+
+# Ignore the generated binary files
+*.pidb
+

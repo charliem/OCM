@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 9.00
+# Visual Studio 2005
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Base Library", "Base Library\Ohm Output Base.csproj", "{3234A57D-B4CD-4F47-B454-8AE620C5FE9E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hbase Thrift Interface", "Hbase Thrift Interface\HbaseThriftInterface.csproj", "{75077802-FA9F-4165-BC13-B794CADF4A97}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OHM Example 1", "Example 1\Example 1.csproj", "{35A01373-B7EF-4FD2-82CB-78CBF5D42FA0}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{5222B471-05E9-457A-844B-C7FD81B0C5C6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5222B471-05E9-457A-844B-C7FD81B0C5C6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5222B471-05E9-457A-844B-C7FD81B0C5C6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5222B471-05E9-457A-844B-C7FD81B0C5C6}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(MonoDevelopProperties) = preSolution
+		name = OHM C Sharp Interface
+		StartupItem = OHM C Sharp Interface.csproj
+	EndGlobalSection
+EndGlobal

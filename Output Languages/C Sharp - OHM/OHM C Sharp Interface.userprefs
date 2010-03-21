@@ -1,0 +1,48 @@
+﻿<Properties>
+  <MonoDevelop.Ide.Workbench ActiveDocument="Example 1/Source/User.cs" ctype="Workbench">
+    <Files>
+      <File FileName="Example 1/Source/OHMTest.cs" Line="19" Column="4" />
+      <File FileName="Base Library/Source/HbaseConnection.cs" Line="48" Column="15" />
+      <File FileName="Example 1/Source/User.cs" Line="335" Column="36" />
+      <File FileName="Base Library/Source/OHMConnection.cs" Line="25" Column="35" />
+      <File FileName="Base Library/Source/OHMRow.cs" Line="27" Column="39" />
+      <File FileName="Base Library/Source/OHMRowMutation.cs" Line="63" Column="10" />
+      <File FileName="Base Library/Source/BaseTableScanner.cs" Line="79" Column="46" />
+      <File FileName="Hbase Thrift Interface/Source/Hbase.cs" Line="46" Column="1" />
+    </Files>
+    <Pads>
+      <Pad Id="ProjectPad">
+        <State expanded="True">
+          <Node name="Example 1" expanded="True" selected="True">
+            <Node name="Source" expanded="True" />
+          </Node>
+          <Node name="HbaseThriftInterface" expanded="True">
+            <Option id="ShowVersionControlOverlays" value="False" />
+            <Option id="ShowAllFiles" value="False" />
+            <Node name="References" expanded="True" />
+            <Node name="Source" expanded="True" />
+          </Node>
+          <Node name="Ohm Output Base" expanded="True">
+            <Option id="ShowVersionControlOverlays" value="True" />
+            <Option id="ShowAllFiles" value="True" />
+            <Node name="Source" expanded="True" />
+          </Node>
+        </State>
+      </Pad>
+      <Pad Id="ClassPad">
+        <State expanded="True" selected="True">
+          <Node name="Example 1" expanded="True" />
+          <Node name="HbaseThriftInterface" expanded="True" />
+          <Node name="Ohm Output Base" expanded="True">
+            <Node name="References" expanded="True" />
+            <Node name="OHM" expanded="True" />
+          </Node>
+        </State>
+      </Pad>
+    </Pads>
+  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.DebuggingService>
+    <BreakpointStore />
+  </MonoDevelop.Ide.DebuggingService>
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" ctype="Workspace" />
+</Properties>

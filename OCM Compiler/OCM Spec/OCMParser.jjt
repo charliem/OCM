@@ -1,0 +1,189 @@
+PARSER_BEGIN(OCMParser)
+
+package com.kissintellignetsystems.ocm.compiler.parser;
+
+import com.kissintellignetsystems.ocm.compiler.*;
+
+import java.io.*;
+import java.util.*;
+
+public class OCMParser 
+{
+}
+
+PARSER_END(OCMParser)
+
+    
+
+
+// 2. Lexical specification
+
+SKIP: {
+  " "
+| "\t"
+| "\n"
+| "\r"
+| <"//" (~["\n","\r"])* ("\n"|"\r")>
+| "/*": IN_COMMENT 
+}
+
+// When any other character is seen in the IN_COMMENT state, skip it.
+< IN_COMMENT > SKIP : {
+
+    <  ~[] > }
+      
+// When a */ is seen in the IN_COMMENT state, skip it and switch back to the DEFAULT state
+< IN_COMMENT > SKIP : {
+
+    "*/": DEFAULT } 
+
+
+
+/* Types */
+TOKEN : {
+	<BOOLEAN: "Boolean"> |
+	<BYTE: "Byte"> |
+	<BYTESTREAM: "ByteStream"> |
+	<DOUBLE: "Double"> |
+    <FLOAT: "Float"> |
+	<INT: "Int"> |
+	<LONG: "Long"> |
+    <STRING: "String">    
+}
+
+/* Reserved Words */
+TOKEN : {
+	<SUPER_FAMILY: "SuperFamily"> |
+	<DYNAMIC_SUPER_FAMILY: "DynamicSuperFamily"> |
+	<MANY_2_MANY: "Many2Many"> |
+	<KEY: "Key"> |
+	<COLUMN_FAMILY: "ColumnFamily">
+}
+
+
+TOKEN : {
+ <IDENTIFIER: <LETTER> (<LETTER> | <DIGIT>)*>
+|  <#LETTER: ["$","A"-"Z","_","a"-"z"]>
+|  <#DIGIT: ["0"-"9"]>
+}
+
+TOKEN : {
+ <LIT: <QUOTE> (<LETTER> | <DIGIT> | " ")* <QUOTE> >
+}
+
+/* Terminal Char */
+TOKEN :
+{
+	< TERM : ";" >
+}
+
+TOKEN :
+{
+	< DOT : "." >
+}
+
+TOKEN :
+{
+	< EQUALS : "=" > | < QUOTE : "\"" >
+}
+
+/* Square Brackets */
+TOKEN :
+{
+	< LEFT_SQUARE_BRACKET: "[" > | < RIGHT_SQUARE_BRACKET: "]" >
+}
+
+/* Braces */
+TOKEN :
+{
+	< LEFT_BRACE: "{" > | < RIGHT_BRACE: "}" >
+}
+
+SimpleNode parse() # OCMSpec() :{}
+{
+  (ColumnFamily())+ 
+  { return jjtThis; }
+}
+
+void ColumnFamily() #ColumnFamily : {Token t = null; Token i = null; } 
+{
+  ((<LEFT_SQUARE_BRACKET> i=<IDENTIFIER> <EQUALS> t=<LIT> <RIGHT_SQUARE_BRACKET> )
+  {
+  		jjtThis.setAnnotation(i.image, t.image);
+  })*
+  
+  <COLUMN_FAMILY>
+  t=<IDENTIFIER> 
+  <LEFT_BRACE>
+  Field()
+  (SuperFamily() | DynamicSuperFamily() | Many2Many())+
+  <RIGHT_BRACE>
+  	{
+		jjtThis.setName(t.image);
+	}
+}
+
+void Field() #Field : { Token t = null; Token i = null; } 
+{
+  (<LEFT_SQUARE_BRACKET> i=<IDENTIFIER> ( 
+	  (<EQUALS> t=<LIT> <RIGHT_SQUARE_BRACKET> )
+	  {
+	  		jjtThis.setAnnotation(i.image, t.image);
+	  } 
+  |
+	  (<RIGHT_SQUARE_BRACKET>)
+	  {
+	  		jjtThis.setAnnotation(i.image);
+	  }
+  ))*
+	(t=<BOOLEAN>|t=<BYTE>|t=<BYTESTREAM>|t=<DOUBLE>|t=<FLOAT>|t=<INT>|t=<LONG>|t=<STRING>)
+	(i=<IDENTIFIER>)
+	<TERM>
+	
+	{
+		jjtThis.setType(t.image);
+		jjtThis.setName(i.image);
+	}
+}
+
+void SuperFamily() #SuperFamily: { Token t = null; }
+{
+	<SUPER_FAMILY>
+	t=<IDENTIFIER>
+	<LEFT_BRACE>
+	(Field())+
+	<RIGHT_BRACE>
+	
+	{
+		jjtThis.setName(t.image);
+	}
+}
+
+void DynamicSuperFamily() #DynamicSuperFamily: { Token i = null; Token t = null; }
+{
+	<DYNAMIC_SUPER_FAMILY>
+	(t=<BOOLEAN>|t=<BYTE>|t=<BYTESTREAM>|t=<DOUBLE>|t=<FLOAT>|t=<INT>|t=<LONG>|t=<STRING>)
+	(i=<IDENTIFIER>)
+	<TERM>
+	
+	{
+		jjtThis.setName(i.image);
+		jjtThis.setType(t.image);
+	}
+}
+
+
+void Many2Many() #Many2Many: { Token i = null; Token c = null; Token f = null; }
+{
+	<MANY_2_MANY>
+	((c=<IDENTIFIER>)<DOT>(f=<IDENTIFIER>))
+	(i=<IDENTIFIER>)
+	<TERM>
+	
+	{
+		jjtThis.setColumnFamily(c.image);
+		jjtThis.setField(f.image);
+		
+		jjtThis.setName(i.image);
+	}
+}
