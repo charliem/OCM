@@ -17,13 +17,7 @@ import java.util.Random;
 
 import me.prettyprint.cassandra.service.Keyspace;
 
-import org.apache.cassandra.service.Column;
-import org.apache.cassandra.service.ColumnParent;
-import org.apache.cassandra.service.ColumnPath;
-import org.apache.cassandra.service.NotFoundException;
-import org.apache.cassandra.service.SlicePredicate;
-import org.apache.cassandra.service.SliceRange;
-import org.apache.cassandra.service.SuperColumn;
+import org.apache.cassandra.thrift.*;
 import org.apache.thrift.TException;
 
 import com.kissintelligentsystems.ocm.java.BaseTable;
@@ -149,7 +143,10 @@ public class User extends BaseTable
 			keyspace = connection.borrowKeySpace();
 				
 			//Use the index
-			Column keyCol = keyspace.getColumn(key, new ColumnPath("UsersByEmail", null, fromString("key")));
+			ColumnPath columnPath = new ColumnPath("UsersByEmail");
+			columnPath.column = fromString("key");
+			
+			Column keyCol = keyspace.getColumn(key, columnPath);
 
 			String index = toString(keyCol.getValue());
 				
@@ -184,12 +181,17 @@ public class User extends BaseTable
 				
 			while (enumeration.hasMoreElements())
 			{
+				//The Foreign Key
+				ColumnPath columnPath = new ColumnPath("Accounts");
+				columnPath.setSuper_column(accountsUsersForeignNameBytes);
+				columnPath.column = fromString(userID);
+
 				//Remove the foreign key
-				keyspace.remove(enumeration.nextElement(), new ColumnPath("Accounts",  accountsUsersForeignNameBytes, fromString(userID)));
+				keyspace.remove(enumeration.nextElement(), columnPath);
 			}
 
 			//Delete the actual row
-			keyspace.remove(userID, new ColumnPath("Users",null, null));
+			keyspace.remove(userID, new ColumnPath("Users"));
 			
 		}
 		finally
@@ -208,16 +210,18 @@ public class User extends BaseTable
 			//Get the Key Space from the Connection Pool
 			keyspace = connection.borrowKeySpace();
 				
-			SlicePredicate pred = new SlicePredicate(null, new SliceRange(new byte[0], new byte[0], false, 10000));
+			SlicePredicate pred = new SlicePredicate();
+			pred.setSlice_range(new SliceRange(new byte[0], new byte[0], false, 10000));
 
-			List<SuperColumn> data = keyspace.getSuperSlice(userID, new ColumnParent("Users", null), pred);
+			List<SuperColumn> data = keyspace.getSuperSlice(userID, new ColumnParent("Users"), pred);
 								
 			//Load the fields from the returned data
 			loadAll(data);
 		}
 		finally
 		{
-			connection.returnKeySpace(keyspace);
+			if(keyspace != null)
+				connection.returnKeySpace(keyspace);
 		}
 	}
 	
@@ -265,9 +269,13 @@ public class User extends BaseTable
 			//Get the Key Space from the Connection Pool
 			keyspace = connection.borrowKeySpace();
 				
-			SlicePredicate pred = new SlicePredicate(null, new SliceRange(new byte[0], new byte[0], false, 10000));
+			SlicePredicate pred = new SlicePredicate();
+			pred.setSlice_range(new SliceRange(new byte[0], new byte[0], false, 10000));
 				
-			List<Column> data  = keyspace.getSlice(userID, new ColumnParent("Users", authSuperNameBytes), pred);
+			ColumnParent columnParent = new ColumnParent("Users");
+			columnParent.setSuper_column(authSuperNameBytes);
+
+			List<Column> data = keyspace.getSlice(userID, columnParent, pred);
 	
 			loadAuth(data);
 		}
@@ -321,9 +329,13 @@ public class User extends BaseTable
 			//Get the Key Space from the Connection Pool
 			keyspace = connection.borrowKeySpace();
 				
-			SlicePredicate pred = new SlicePredicate(null, new SliceRange(new byte[0], new byte[0], false, 10000));
+			SlicePredicate pred = new SlicePredicate();
+			pred.setSlice_range(new SliceRange(new byte[0], new byte[0], false, 10000));
 				
-			List<Column> data  = keyspace.getSlice(userID, new ColumnParent("Users", infoSuperNameBytes), pred);
+			ColumnParent columnParent = new ColumnParent("Users");
+			columnParent.setSuper_column(infoSuperNameBytes);
+
+			List<Column> data = keyspace.getSlice(userID, columnParent, pred);
 	
 			loadInfo(data);
 		}
@@ -380,11 +392,15 @@ public class User extends BaseTable
 		{
 			//Get the Key Space from the Connection Pool
 			keyspace = connection.borrowKeySpace();
+			
+			SlicePredicate pred = new SlicePredicate();
+			pred.setSlice_range(new SliceRange(new byte[0], new byte[0], false, 10000));
 				
-			SlicePredicate pred = new SlicePredicate(null, new SliceRange(new byte[0], new byte[0], false, 10000));
-				
-			List<Column> data  = keyspace.getSlice(userID, new ColumnParent("Users", rolesSuperNameBytes), pred);
-	
+			ColumnParent columnParent = new ColumnParent("Users");
+			columnParent.setSuper_column(rolesSuperNameBytes);
+
+			List<Column> data = keyspace.getSlice(userID, columnParent, pred);
+
 			loadRoles(data);
 		}
 			
@@ -421,10 +437,15 @@ public class User extends BaseTable
 		{
 			//Get the Key Space from the Connection Pool
 			keyspace = connection.borrowKeySpace();
+			
+
+			SlicePredicate pred = new SlicePredicate();
+			pred.setSlice_range(new SliceRange(new byte[0], new byte[0], false, 10000));
 				
-			SlicePredicate pred = new SlicePredicate(null, new SliceRange(new byte[0], new byte[0], false, 10000));
-				
-			List<Column> data  = keyspace.getSlice(userID, new ColumnParent("Users", accountsSuperNameBytes), pred);
+			ColumnParent columnParent = new ColumnParent("Users");
+			columnParent.setSuper_column(accountsSuperNameBytes);
+
+			List<Column> data  = keyspace.getSlice(userID, columnParent, pred);
 	
 			loadAccounts(data);
 		}
@@ -538,13 +559,16 @@ public class User extends BaseTable
 				//Update the changed flag
 				email_Changed = false;
 
+				ColumnPath columnPath = new ColumnPath("UsersByEmail");
+				columnPath.column = fromString("key");
+
 				//Indexed Field
 				if(email_Original != null)
 				{
 					try
 					{
 						//Remove the old index
-						keyspace.remove(email_Original, new ColumnPath("UsersByEmail", null, fromString("key")));
+						keyspace.remove(email_Original, columnPath);
 					}
 					catch(Exception exp)
 					{
@@ -553,7 +577,7 @@ public class User extends BaseTable
 				}
 					
 				//Insert the new index
-				keyspace.insert(email, new ColumnPath("UsersByEmail", null, fromString("key")), fromString(userID));
+				keyspace.insert(email, columnPath, fromString(userID));
 			}
 			
 			//Check if there were any changes to this super column
@@ -577,8 +601,12 @@ public class User extends BaseTable
 
 			while(dynamicIterator.hasNext())
 			{
+				ColumnPath columnPath = new ColumnPath("Users");
+				columnPath.setSuper_column(rolesSuperNameBytes);
+				columnPath.column = fromString(dynamicIterator.next());
+
 				//Remove the column
-				keyspace.remove(userID, new ColumnPath("Users", fromString("roles"), fromString(dynamicIterator.next())));
+				keyspace.remove(userID, columnPath);
 			}
 
 			updatedKeys = roles.getUpdatedColumns().keys();
@@ -613,12 +641,20 @@ public class User extends BaseTable
 			while(dynamicIterator.hasNext())
 			{
 				String foreignKey = dynamicIterator.next();
-					
+							
+				ColumnPath localColumnPath = new ColumnPath("Users");
+				localColumnPath.setSuper_column(accountsSuperNameBytes);
+				localColumnPath.column = fromString(foreignKey);
+
 				//Remove the column from this column family
-				keyspace.remove(userID, new ColumnPath("Users", accountsSuperNameBytes, fromString(foreignKey)));
-				
+				keyspace.remove(userID, localColumnPath);
+
+				ColumnPath foriegnColumnPath = new ColumnPath("Accounts");
+				foriegnColumnPath.setSuper_column(accountsUsersForeignNameBytes);
+				foriegnColumnPath.column = fromString(userID);
+	
 				//Remove this item from the other table
-				keyspace.remove(foreignKey, new ColumnPath("Accounts", accountsUsersForeignNameBytes, fromString(userID)));
+				keyspace.remove(foreignKey, foriegnColumnPath);
 			}
 
 			updatedKeys = accounts.getUpdatedColumns().keys();
@@ -630,8 +666,12 @@ public class User extends BaseTable
 				//Add it to this tables column
 				cols.add(new Column(fromString(accounts.get(foreignKey).getKey()), new byte[0], System.currentTimeMillis()));
 					
+				ColumnPath columnPath = new ColumnPath("Accounts");
+				columnPath.setSuper_column(accountsUsersForeignNameBytes);
+				columnPath.column = fromString(userID);
+
 				//Add the other tables key to this item					
-				keyspace.insert(accounts.get(foreignKey).getKey(), new ColumnPath("Accounts", accountsUsersForeignNameBytes, fromString(userID)), new byte[0]);
+				keyspace.insert(accounts.get(foreignKey).getKey(), columnPath, new byte[0]);
 			}
 				
 			//Check if there were any changes to this super column

@@ -2,15 +2,20 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
-	<classpathentry kind="lib" path="/home/charlie/Devel/Charlies Projects/OCM/Output Languages/Java/OCMJavaBaseLib.jar" sourcepath="/Base Library/src"/>
-	<classpathentry kind="lib" path="hector-0.5.0-7.jar"/>
-	<classpathentry kind="lib" path="apache-cassandra-incubating-0.5.0.jar" sourcepath="/Base Library/libs/apache-cassandra-incubating-0.5.0.jar"/>
-	<classpathentry kind="lib" path="libthrift-r820831.jar"/>
-	<classpathentry kind="lib" path="slf4j-api-1.5.8.jar"/>
-	<classpathentry kind="lib" path="commons-pool-1.5.3.jar"/>
-	<classpathentry kind="lib" path="commons-codec-1.4.jar"/>
-	<classpathentry kind="lib" path="slf4j-log4j12-1.5.8.jar"/>
-	<classpathentry kind="lib" path="google-collections-1.0.jar"/>
-	<classpathentry kind="lib" path="log4j-1.2.14.jar"/>
+	<classpathentry kind="lib" path="/home/charlie/Devel/Charlies Projects/OCM/Output Languages/Java/OCMJavaBaseLib.jar" sourcepath="/home/charlie/Devel/Charlies Projects/OCM/Output Languages/Java/OCMJavaBaseLib.jar"/>
+	<classpathentry kind="lib" path="/home/charlie/Devel/Charlies Projects/OCM/Source/Output Languages/Java/Base Library/libs/slf4j-log4j12-1.5.8.jar"/>
+	<classpathentry kind="lib" path="/home/charlie/Devel/Charlies Projects/OCM/Source/Output Languages/Java/Base Library/libs/libthrift-r917130.jar"/>
+	<classpathentry kind="lib" path="/home/charlie/Devel/Charlies Projects/OCM/Source/Output Languages/Java/Base Library/libs/log4j-1.2.14.jar"/>
+	<classpathentry kind="lib" path="/home/charlie/Devel/Charlies Projects/OCM/Source/Output Languages/Java/Base Library/libs/google-collections-1.0.jar"/>
+	<classpathentry kind="lib" path="/home/charlie/Devel/Charlies Projects/OCM/Source/Output Languages/Java/Base Library/libs/commons-pool-1.5.3.jar"/>
+	<classpathentry kind="lib" path="/home/charlie/Devel/Charlies Projects/OCM/Source/Output Languages/Java/Base Library/libs/commons-codec-1.4.jar"/>
+	<classpathentry kind="lib" path="/home/charlie/Devel/Charlies Projects/OCM/Source/Output Languages/Java/Base Library/libs/perf4j-0.9.12.jar"/>
+	<classpathentry kind="lib" path="/home/charlie/Devel/Charlies Projects/OCM/Source/Output Languages/Java/Base Library/libs/slf4j-api-1.5.8.jar"/>
+	<classpathentry kind="lib" path="/home/charlie/Devel/Charlies Projects/OCM/Source/Output Languages/Java/Base Library/libs/high-scale-lib.jar"/>
+	<classpathentry kind="lib" path="/home/charlie/Devel/Charlies Projects/OCM/Source/Output Languages/Java/Base Library/libs/hector-0.6.0-10.jar"/>
+	<classpathentry kind="lib" path="/home/charlie/Devel/Charlies Projects/OCM/Source/Output Languages/Java/Base Library/libs/apache-cassandra-0.6.0-rc1.jar"/>
+	<classpathentry kind="lib" path="/home/charlie/Devel/Charlies Projects/OCM/Source/Output Languages/Java/Base Library/libs/clhm-production.jar"/>
+	<classpathentry kind="lib" path="/home/charlie/Devel/Charlies Projects/OCM/Source/Output Languages/Java/Base Library/libs/cassandra-javautils.jar"/>
+	<classpathentry kind="lib" path="/home/charlie/Devel/Charlies Projects/OCM/Source/Output Languages/Java/Base Library/libs/hector-0.6.0-10-sources.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

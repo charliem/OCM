@@ -2,13 +2,11 @@ package com.kissintelligentsystems.ocm.java;
 
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
-import java.nio.charset.Charset;
 import java.util.Random;
 
-import org.apache.cassandra.service.NotFoundException;
-import org.apache.thrift.TException;
-
 import me.prettyprint.cassandra.service.Keyspace;
+
+import org.apache.thrift.TException;
 
 public abstract class BaseTable 
 {
@@ -23,7 +21,7 @@ public abstract class BaseTable
 	public abstract void loadAll() throws Exception;
 
 	
-	protected String generateNewKey(OCMConnection connection, byte[] tableName, Random rand) throws IllegalArgumentException, NotFoundException, TException, Exception
+	protected String generateNewKey(OCMConnection connection, byte[] tableName, Random rand) throws IllegalArgumentException, org.apache.cassandra.thrift.NotFoundException, TException, Exception
 	{
 		Keyspace keyspace = null;
 		String key = null;

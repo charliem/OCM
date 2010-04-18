@@ -1,7 +1,7 @@
 ﻿ OCM  - The Object Cassandra Mapper Read Me
 ----------------------------------------
 
-Version: 0.5
+Version: 0.6.0
 
 OHM is an interface tool for the Apache Project's
 clustered database engine, Cassandra. OCM is licensed under
@@ -60,3 +60,11 @@ You can find additional information on the projects web
 site.
 
 	http://github.com/charliem/OCM
+
+
+Release Notes:
+
+0.6.0
+	* Moved to Hector 0.6 and therefore Cassandra 0.6
+
+	* Moved to using Hector style versioning where the first two version numbers are those of the Cassandra version supported.

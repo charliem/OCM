@@ -4,13 +4,14 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.cassandra.thrift.ColumnParent;
+import org.apache.cassandra.thrift.NotFoundException;
+import org.apache.cassandra.thrift.SlicePredicate;
+import org.apache.cassandra.thrift.SliceRange;
+import org.apache.cassandra.thrift.SuperColumn;
+
 import me.prettyprint.cassandra.service.Keyspace;
 
-import org.apache.cassandra.service.ColumnParent;
-import org.apache.cassandra.service.NotFoundException;
-import org.apache.cassandra.service.SlicePredicate;
-import org.apache.cassandra.service.SliceRange;
-import org.apache.cassandra.service.SuperColumn;
 
 public class BaseTableScanner
 {	
@@ -92,11 +93,12 @@ public class BaseTableScanner
 		return row;		
 	}
 	
-	private void getRows() throws IllegalArgumentException, NotFoundException, Exception
+	private void getRows() throws Exception
 	{
 		Keyspace keyspace = connection.borrowKeySpace();
 		
-		SlicePredicate pred = new SlicePredicate(null, new SliceRange(new byte[0], new byte[0], false, 1000));
+		SlicePredicate pred = new SlicePredicate();
+		pred.setSlice_range(new SliceRange(new byte[0], new byte[0], false, 1000));
 		
 		int currentBatchSize = totalLimit - rowsReturned;
 		
@@ -106,7 +108,7 @@ public class BaseTableScanner
 		}
 		
 		//Perform the range query
-		Map<String, List<SuperColumn>> results = keyspace.getSuperRangeSlice(new ColumnParent(columnFamily, null), pred, startKey, stopKey, currentBatchSize);
+		Map<String, List<SuperColumn>> results = keyspace.getSuperRangeSlice(new ColumnParent(columnFamily), pred, startKey, stopKey, currentBatchSize);
 		
 		
 		currentRows = new RowData[results.size()];	

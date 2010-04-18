@@ -17,13 +17,7 @@ import java.util.Random;
 
 import me.prettyprint.cassandra.service.Keyspace;
 
-import org.apache.cassandra.service.Column;
-import org.apache.cassandra.service.ColumnParent;
-import org.apache.cassandra.service.ColumnPath;
-import org.apache.cassandra.service.NotFoundException;
-import org.apache.cassandra.service.SlicePredicate;
-import org.apache.cassandra.service.SliceRange;
-import org.apache.cassandra.service.SuperColumn;
+import org.apache.cassandra.thrift.*;
 import org.apache.thrift.TException;
 
 import com.kissintelligentsystems.ocm.java.BaseTable;
@@ -168,7 +162,10 @@ public class $className extends BaseTable
 			keyspace = connection.borrowKeySpace();
 				
 			//Use the index
-			Column keyCol = keyspace.getColumn(key, new ColumnPath("${columnFamilyName}By${field.getNameUpperCase()}", null, fromString("key")));
+			ColumnPath columnPath = new ColumnPath("${columnFamilyName}By${field.getNameUpperCase()}");
+			columnPath.column = fromString("key");
+			
+			Column keyCol = keyspace.getColumn(key, columnPath);
 
 			String index = toString(keyCol.getValue());
 				
@@ -207,13 +204,18 @@ public class $className extends BaseTable
 				
 			while (enumeration.hasMoreElements())
 			{
+				//The Foreign Key
+				ColumnPath columnPath = new ColumnPath("${family.getColumnFamily()}");
+				columnPath.setSuper_column(${family.getName()}${family.getFieldUpperCase()}ForeignNameBytes);
+				columnPath.column = fromString($keyField.getName());
+
 				//Remove the foreign key
-				keyspace.remove(enumeration.nextElement(), new ColumnPath("${family.getColumnFamily()}",  ${family.getName()}${family.getFieldUpperCase()}ForeignNameBytes, fromString($keyField.getName())));
+				keyspace.remove(enumeration.nextElement(), columnPath);
 			}
 #end
 
 			//Delete the actual row
-			keyspace.remove($keyField.getName(), new ColumnPath("${columnFamilyName}",null, null));
+			keyspace.remove($keyField.getName(), new ColumnPath("${columnFamilyName}"));
 			
 		}
 		finally
@@ -232,16 +234,18 @@ public class $className extends BaseTable
 			//Get the Key Space from the Connection Pool
 			keyspace = connection.borrowKeySpace();
 				
-			SlicePredicate pred = new SlicePredicate(null, new SliceRange(new byte[0], new byte[0], false, 10000));
+			SlicePredicate pred = new SlicePredicate();
+			pred.setSlice_range(new SliceRange(new byte[0], new byte[0], false, 10000));
 
-			List<SuperColumn> data = keyspace.getSuperSlice($keyField.getName(), new ColumnParent("${columnFamilyName}", null), pred);
+			List<SuperColumn> data = keyspace.getSuperSlice($keyField.getName(), new ColumnParent("${columnFamilyName}"), pred);
 								
 			//Load the fields from the returned data
 			loadAll(data);
 		}
 		finally
 		{
-			connection.returnKeySpace(keyspace);
+			if(keyspace != null)
+				connection.returnKeySpace(keyspace);
 		}
 	}
 	
@@ -292,9 +296,13 @@ public class $className extends BaseTable
 			//Get the Key Space from the Connection Pool
 			keyspace = connection.borrowKeySpace();
 				
-			SlicePredicate pred = new SlicePredicate(null, new SliceRange(new byte[0], new byte[0], false, 10000));
+			SlicePredicate pred = new SlicePredicate();
+			pred.setSlice_range(new SliceRange(new byte[0], new byte[0], false, 10000));
 				
-			List<Column> data  = keyspace.getSlice($keyField.getName(), new ColumnParent("${columnFamilyName}", ${family.getName()}SuperNameBytes), pred);
+			ColumnParent columnParent = new ColumnParent("${columnFamilyName}");
+			columnParent.setSuper_column(${family.getName()}SuperNameBytes);
+
+			List<Column> data = keyspace.getSlice($keyField.getName(), columnParent, pred);
 	
 			load${family.getNameUpperCase()}(data);
 		}
@@ -347,11 +355,15 @@ public class $className extends BaseTable
 		{
 			//Get the Key Space from the Connection Pool
 			keyspace = connection.borrowKeySpace();
+			
+			SlicePredicate pred = new SlicePredicate();
+			pred.setSlice_range(new SliceRange(new byte[0], new byte[0], false, 10000));
 				
-			SlicePredicate pred = new SlicePredicate(null, new SliceRange(new byte[0], new byte[0], false, 10000));
-				
-			List<Column> data  = keyspace.getSlice($keyField.getName(), new ColumnParent("${columnFamilyName}", ${family.getName()}SuperNameBytes), pred);
-	
+			ColumnParent columnParent = new ColumnParent("${columnFamilyName}");
+			columnParent.setSuper_column(${family.getName()}SuperNameBytes);
+
+			List<Column> data = keyspace.getSlice($keyField.getName(), columnParent, pred);
+
 			load${family.getNameUpperCase()}(data);
 		}
 			
@@ -390,10 +402,15 @@ public class $className extends BaseTable
 		{
 			//Get the Key Space from the Connection Pool
 			keyspace = connection.borrowKeySpace();
+			
+
+			SlicePredicate pred = new SlicePredicate();
+			pred.setSlice_range(new SliceRange(new byte[0], new byte[0], false, 10000));
 				
-			SlicePredicate pred = new SlicePredicate(null, new SliceRange(new byte[0], new byte[0], false, 10000));
-				
-			List<Column> data  = keyspace.getSlice($keyField.getName(), new ColumnParent("${columnFamilyName}", ${family.getName()}SuperNameBytes), pred);
+			ColumnParent columnParent = new ColumnParent("${columnFamilyName}");
+			columnParent.setSuper_column(${family.getName()}SuperNameBytes);
+
+			List<Column> data  = keyspace.getSlice($keyField.getName(), columnParent, pred);
 	
 			load${family.getNameUpperCase()}(data);
 		}
@@ -454,13 +471,16 @@ public class $className extends BaseTable
 				$field.getName()_Changed = false;
 #if( $field.isIndexed() )
 
+				ColumnPath columnPath = new ColumnPath("${columnFamilyName}By${field.getNameUpperCase()}");
+				columnPath.column = fromString("key");
+
 				//Indexed Field
 				if($field.getName()_Original != null)
 				{
 					try
 					{
 						//Remove the old index
-						keyspace.remove($field.getName()_Original, new ColumnPath("${columnFamilyName}By${field.getNameUpperCase()}", null, fromString("key")));
+						keyspace.remove($field.getName()_Original, columnPath);
 					}
 					catch(Exception exp)
 					{
@@ -469,7 +489,7 @@ public class $className extends BaseTable
 				}
 					
 				//Insert the new index
-				keyspace.insert($field.getName(), new ColumnPath("${columnFamilyName}By${field.getNameUpperCase()}", null, fromString("key")), fromString($keyField.getName()));
+				keyspace.insert($field.getName(), columnPath, fromString($keyField.getName()));
 #end			}
 			
 #end
@@ -496,8 +516,12 @@ public class $className extends BaseTable
 
 			while(dynamicIterator.hasNext())
 			{
+				ColumnPath columnPath = new ColumnPath("${columnFamilyName}");
+				columnPath.setSuper_column(${family.getName()}SuperNameBytes);
+				columnPath.column = fromString(dynamicIterator.next());
+
 				//Remove the column
-				keyspace.remove($keyField.getName(), new ColumnPath("${columnFamilyName}", fromString("$family.getName()"), fromString(dynamicIterator.next())));
+				keyspace.remove($keyField.getName(), columnPath);
 			}
 
 			updatedKeys = ${family.getName()}.getUpdatedColumns().keys();
@@ -534,12 +558,20 @@ public class $className extends BaseTable
 			while(dynamicIterator.hasNext())
 			{
 				String foreignKey = dynamicIterator.next();
-					
+							
+				ColumnPath localColumnPath = new ColumnPath("${columnFamilyName}");
+				localColumnPath.setSuper_column(${family.getName()}SuperNameBytes);
+				localColumnPath.column = fromString(foreignKey);
+
 				//Remove the column from this column family
-				keyspace.remove($keyField.getName(), new ColumnPath("${columnFamilyName}", ${family.getName()}SuperNameBytes, fromString(foreignKey)));
-				
+				keyspace.remove($keyField.getName(), localColumnPath);
+
+				ColumnPath foriegnColumnPath = new ColumnPath("${family.getColumnFamily()}");
+				foriegnColumnPath.setSuper_column(${family.getName()}${family.getFieldUpperCase()}ForeignNameBytes);
+				foriegnColumnPath.column = fromString($keyField.getName());
+	
 				//Remove this item from the other table
-				keyspace.remove(foreignKey, new ColumnPath("${family.getColumnFamily()}", ${family.getName()}${family.getFieldUpperCase()}ForeignNameBytes, fromString($keyField.getName())));
+				keyspace.remove(foreignKey, foriegnColumnPath);
 			}
 
 			updatedKeys = ${family.getName()}.getUpdatedColumns().keys();
@@ -551,8 +583,12 @@ public class $className extends BaseTable
 				//Add it to this tables column
 				cols.add(new Column(fromString(${family.getName()}.get(foreignKey).getKey()), new byte[0], System.currentTimeMillis()));
 					
+				ColumnPath columnPath = new ColumnPath("${family.getColumnFamily()}");
+				columnPath.setSuper_column(${family.getName()}${family.getFieldUpperCase()}ForeignNameBytes);
+				columnPath.column = fromString($keyField.getName());
+
 				//Add the other tables key to this item					
-				keyspace.insert(${family.getName()}.get(foreignKey).getKey(), new ColumnPath("${family.getColumnFamily()}", ${family.getName()}${family.getFieldUpperCase()}ForeignNameBytes, fromString($keyField.getName())), new byte[0]);
+				keyspace.insert(${family.getName()}.get(foreignKey).getKey(), columnPath, new byte[0]);
 			}
 				
 			//Check if there were any changes to this super column

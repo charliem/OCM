@@ -13,10 +13,7 @@ import me.prettyprint.cassandra.service.CassandraClientPoolFactory;
 import me.prettyprint.cassandra.service.Keyspace;
 import me.prettyprint.cassandra.service.PoolExhaustedException;
 
-import org.apache.cassandra.service.ColumnParent;
-import org.apache.cassandra.service.SlicePredicate;
-import org.apache.cassandra.service.SliceRange;
-import org.apache.cassandra.service.SuperColumn;
+import org.apache.cassandra.thrift.*;
 
 import com.kissintelligentsystems.ocm.java.OCMConnection;
 import com.kissintelligentsystems.ocm.java.sample.generated.Account;
@@ -36,7 +33,7 @@ public class OCMTest
 		
 		connection.connect("localhost", 9160, "keyspace1");
 
-		
+		/*
 		
 		
 			
@@ -91,7 +88,7 @@ public class OCMTest
 			pool.releaseClient(client);
 		}
 
-		
+		*/
 
 		
 		//Test the Sample User Column
